@@ -2,31 +2,31 @@
 
 ## Token-based authentication
 
-- It's the most common approach of authentication for for securing web applications.
+- It's the most common approach of authentication for securing web applications.
 - It involves generating and validating tokens (usually JSON Web Tokens, JWTs) to authenticate users.
 
 Here’s how we can implement token-based authentication in a Node.js web application:
 
-### Step 1 - Choose an Authentication Strategy:
+### 1. Choose an Authentication Strategy:
 
 Decide on the type of authentication we want to implement. Common options include username/password, social media login (e.g., using OAuth), or token-based authentication (e.g., JWT).
 
-### Step 2 - Set Up Node.js Project:
+### 2. Set Up Node.js Project:
 
 > npm init
 
-### Step 3 - Install required Dependency Packages:
+### 3. Install required Dependency Packages:
 
 Depending on our chosen authentication strategy, we may need to install relevant packages. here, we’re using JWT, we can install the ‘jsonwebtoken’ package:
 
-> npm install jsonwebtoken
+> npm install jsonwebtoken bcrypt mongoose
 
-### Step 4 - Create a User Model:
+### 4. Create a User Model:
 
 Define a user model to store user data in database (e.g., MongoDB, PostgreSQL, or MySQL). We can use an ORM like Mongoose (for MongoDB) or Sequelize (for SQL databases). a simplified coding snippet for MongoDB and Mongoose is below:
 
 ```
---> models/User.js
+--> src/models/User.js
 
 const mongoose = require('mongoose');
 const userSchema = new mongoose.Schema({
@@ -36,12 +36,12 @@ const userSchema = new mongoose.Schema({
 module.exports = mongoose.model('User', userSchema);
 ```
 
-### Step 5 - Create Routes and Controllers:
+### 5. Create Routes and Controllers:
 
 Set up routes and controllers for user registration, login, and authentication.
 
 ```
---> routes/auth.js
+--> src/routes/auth.js
 
  const express = require('express');
  const router = express.Router();
@@ -86,12 +86,12 @@ Set up routes and controllers for user registration, login, and authentication.
 module.exports = router;
 ```
 
-### Step 6 - Protect Routes:
+### 6. Protect Routes:
 
 Implement middleware to protect routes that require authentication. we can use a middleware function to verify JWT tokens:
 
 ```
---> middleware/authMiddleware.js
+--> src/middleware/authMiddleware.js
 
 const jwt = require('jsonwebtoken');
 
@@ -110,12 +110,12 @@ try {
 module.exports = verifyToken;
 ```
 
-### Step 7 - Use Authentication Middleware:
+### 7. Use Authentication Middleware:
 
 Apply the authentication middleware to protect specific routes in application:
 
 ```
---> routes/protectedRoute.js
+--> src/routes/protectedRoute.js
 
  const express = require('express');
  const router = express.Router();
@@ -128,3 +128,31 @@ Apply the authentication middleware to protect specific routes in application:
 
 module.exports = router;
 ```
+
+### 8. Start Your Express Application:
+
+Set up your main application file app.js and start the Express server:
+
+```
+--> src/app.js
+
+ const express = require('express');
+ const app = express();
+ const authRoutes = require('./routes/auth');
+ const protectedRoute = require('./routes/protectedRoute');
+ app.use(express.json());
+ app.use('/auth', authRoutes);
+ app.use('/protected', protectedRoute);
+ const PORT = process.env.PORT || 3000;
+ app.listen(PORT, () => {
+ console.log(`Server is running on port ${PORT}`);
+ });
+```
+
+### 9. Run Your Application:
+
+Start your Node.js application using
+
+> npm start
+
+This example demonstrates a basic implementation of authentication in a Node.js web application using Express.js, MongoDB for storing user data, and JWT for token-based authentication. Remember to replace `’your-secret-key’` with a strong, secret key and consider using environment variables for configuration and security. Additionally, in a production environment, you should use HTTPS to secure communication between the client and server.
